@@ -32,7 +32,7 @@
         <ul>
           <template is="dom-repeat" items="{{repositories}}">
             <li>
-              <a href="[[item.url]]">[[item.name]]</a>
+              <a href="[[item.html_url]]">[[item.name]]</a>
               <template is="dom-if" if="{{item.fork}}">
                 <span class="fork">(fork)</span>
               </template>

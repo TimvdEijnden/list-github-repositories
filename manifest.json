@@ -1,0 +1,6 @@
+{
+  "name": "list-github-repositories",
+  "short_name": "list-github-repositories",
+  "start_url": "/",
+  "display": "standalone"
+}

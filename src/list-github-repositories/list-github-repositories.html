@@ -1,0 +1,100 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">>
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
+
+<dom-module id="list-github-repositories">
+  <template>
+    <style>
+       :host {
+        display: block;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .error {
+        color: red;
+      }
+    </style>
+
+    <label>
+      <input type="text" id="username" placeholder="GitHub username" value="{{username::input}}">
+    </label>
+    <button on-tap="handleSubmit">Show repositories</button>
+    <template is="dom-if" if="{{loading}}">
+      <h2>Loading repositories for [[username]]...</h2>
+    </template>
+    <template is="dom-if" if="{{error}}">
+      <h2 class="error">Failed loading repositories for [[username]]!</h2>
+    </template>
+    <template is="dom-if" if="{{repositories.length}}">
+      <div class="repos">
+        <h2>Found [[repositories.length]] repositories for [[username]]!</h2>
+        <ul>
+          <template is="dom-repeat" items="{{repositories}}">
+            <li>
+              <a href="[[item.url]]">[[item.name]]</a>
+              <template is="dom-if" if="{{item.fork}}">
+                <span class="fork">(fork)</span>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </div>
+      
+    </template>
+
+  </template>
+
+  <script>
+    /** @polymerElement */
+    class Polymer20TestApp extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() {
+        return 'list-github-repositories';
+      }
+      static get properties() {
+        return {
+          username: {
+            type: String,
+            value: 'timvdeijnden',
+          },
+          repositories: {
+            type: Array,
+            value: []
+          },
+          loading: {
+            type: Boolean,
+            value: false
+          },
+          error: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      handleSubmit() {
+        if (this.username.length > 3) {
+          this.loading = true;
+          fetch(`https://api.github.com/users/${this.username}/repos`).then((response) => {
+            console.log(response.ok);
+            if (response.ok) {
+              response.json().then((json) => {
+                this.loading = false;
+                this.repositories = json;
+              })
+            } else {
+              this.loading = false;
+              this.error = true;
+            }
+          });
+        }
+      }
+    }
+
+
+
+
+
+    window.customElements.define(Polymer20TestApp.is, Polymer20TestApp);
+  </script>
+</dom-module>
